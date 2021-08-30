@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS counter;
+
+CREATE TABLE counter (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    count INTEGER NOT NULL
+);
+
+INSERT INTO counter (count)
+VALUES (0);

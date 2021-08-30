@@ -13,15 +13,15 @@ unpad = lambda s: s[:-ord(s[len(s) - 1:])]
 secret_key = 'alongsecrethereshouldbesafe'
  
  
-def encrypt(raw, secret_key):
+def encrypt(raw : str, secret_key : str):
     private_key = hashlib.sha256(secret_key.encode("utf-8")).digest()
     raw = pad(raw)
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(private_key, AES.MODE_CBC, iv)
-    return base64.b64encode(iv + cipher.encrypt(raw))
+    return base64.b64encode(iv + cipher.encrypt(raw.encode('utf-8')))
  
  
-def decrypt(enc, secret_key):
+def decrypt(enc : bytes, secret_key : str):
     private_key = hashlib.sha256(secret_key.encode("utf-8")).digest()
     enc = base64.b64decode(enc)
     iv = enc[:16]
