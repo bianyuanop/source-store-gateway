@@ -4,6 +4,7 @@ from sqlite3.dbapi2 import Cursor
 from flask import Flask, redirect
 from flask_cors import CORS
 import sqlite3
+import util
 
 from werkzeug.datastructures import ContentSecurityPolicy
 
@@ -29,31 +30,18 @@ def counter():
         'count': query_res[0]
     })
 
-@app.route('/gateway/<version>/<param>/<id>', methods=['GET'])
-def gateway(version, param, id):
-    if version not in HOSTS.keys():
-        return json.dumps({
-            'msg': 'bad version'
-        })
-    
-    if param not in PARAM.keys():
-        return json.dumps({
-            'msg': 'bad param'
-        })
+@app.route('/gateway/<encoded_sig>', methods=['GET'])
+def gateway(encoded_sig):
+
+    directTo = util.decrypt(encoded_sig, util.secret_key)
 
     db = sqlite3.connect('./counter.db')
     cursor = db.cursor()
     res = cursor.execute('UPDATE counter SET count=count+1 WHERE id=1')
     db.commit()
-    print(res)
 
-    host = HOSTS[version]
-    param = PARAM[param]
+    redirect(directTo, 302)
 
-    directTo = host + param + id
-    print(directTo)
-
-    return redirect(directTo, 302)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9000)
